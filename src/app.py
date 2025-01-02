@@ -1,5 +1,6 @@
 import pygame
 
+from grid import Grid
 
 class App:
     def __init__(self, WIDTH: int = 100, HEIGHT = 100, CELL_SIZE = 4):
@@ -7,6 +8,7 @@ class App:
         self.screen = pygame.display.set_mode((WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE))
         self.clock = pygame.time.Clock()
         self.running = True
+        self.grid = Grid(WIDTH, HEIGHT)
 
         while self.running:
             for event in pygame.event.get():
