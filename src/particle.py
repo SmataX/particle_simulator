@@ -2,6 +2,15 @@ import random
 
 from grid import Grid
 
+class SolidParticle:
+    def __init__(self, colors: list, density: int = 10):
+        self.__colors = colors
+        self.color = random.choice(self.__colors)
+        self.density = density
+    
+    def step(self, grid: Grid, x: int, y: int):
+        pass
+
 class PowderParticle:
     def __init__(self, colors: list, density: int = 10):
         self.__colors = colors

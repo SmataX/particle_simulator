@@ -2,7 +2,7 @@ import pygame
 import random
 
 from grid import Grid
-from particle import PowderParticle, LiquidParticle
+from particle import PowderParticle, LiquidParticle, SolidParticle
 
 class ToolBar:
     current_particle = 0
@@ -10,7 +10,8 @@ class ToolBar:
     def get_particle():
         particles_list = [
             PowderParticle(["#f6d7b0", "#f2d2a9", "#eccca2"]), 
-            LiquidParticle(["#00b1ff", "#0097ff", "#1588ff"])]
+            LiquidParticle(["#00b1ff", "#0097ff", "#1588ff"]),
+            SolidParticle(["#dd8a3c", "#e69a4b"])]
         return particles_list[ToolBar.current_particle]
 
 class App:
@@ -45,6 +46,8 @@ class App:
             ToolBar.current_particle = 0
         elif keys[pygame.K_2]:
             ToolBar.current_particle = 1
+        elif keys[pygame.K_3]:
+            ToolBar.current_particle = 2
 
         if pygame.mouse.get_pressed()[0]:
             mouse_pos_in_grid = self.get_position_in_grid(pygame.mouse.get_pos())
