@@ -4,6 +4,15 @@ import random
 from grid import Grid
 from particle import PowderParticle, LiquidParticle
 
+class ToolBar:
+    current_particle = 0
+
+    def get_particle():
+        particles_list = [
+            PowderParticle(["#f6d7b0", "#f2d2a9", "#eccca2"]), 
+            LiquidParticle(["#00b1ff", "#0097ff", "#1588ff"])]
+        return particles_list[ToolBar.current_particle]
+
 class App:
     def __init__(self, WIDTH: int = 100, HEIGHT = 100, CELL_SIZE = 4):
         pygame.init()
@@ -31,15 +40,21 @@ class App:
         return [round(position[0] / self.cell_size), round(position[1] / self.cell_size)]
 
     def update(self):
-        if pygame.mouse.get_pressed(3):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_1]:
+            ToolBar.current_particle = 0
+        elif keys[pygame.K_2]:
+            ToolBar.current_particle = 1
+
+        if pygame.mouse.get_pressed()[0]:
             mouse_pos_in_grid = self.get_position_in_grid(pygame.mouse.get_pos())
             if self.grid.is_within(mouse_pos_in_grid[0], mouse_pos_in_grid[1]):
-                self.grid.set_value(mouse_pos_in_grid[0], mouse_pos_in_grid[1], PowderParticle(colors=["#ffff00"]))
+                self.grid.set_value(mouse_pos_in_grid[0], mouse_pos_in_grid[1], ToolBar.get_particle())
 
         for y in range(self.grid.height - 1, 0, -1):
-            x_indices = list(range(self.grid.width))
-            random.shuffle(x_indices)  # Randomize the order of horizontal processing
-            for x in x_indices:
+            random_row = list(range(self.grid.width))
+            random.shuffle(random_row)
+            for x in random_row:
                 target_cell = self.grid.get_value(x, y)
                 if target_cell:
                     target_cell.step(self.grid, x, y)
