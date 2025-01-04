@@ -2,16 +2,25 @@ import pygame
 import random
 
 from grid import Grid
-from particle import PowderParticle, LiquidParticle, SolidParticle
+from particle import PowderParticle, LiquidParticle, Particle
 
 class ToolBar:
     current_particle = 0
+    brush_radius = 5
+
+    def draw(grid: Grid, pos_x: int, pos_y: int):
+        center_x = (pos_x - round(ToolBar.brush_radius / 2))
+        center_y = (pos_y - round(ToolBar.brush_radius / 2))
+        for x in range(ToolBar.brush_radius):
+            for y in range(ToolBar.brush_radius):
+                if grid.is_within(center_x + x, center_y + y):
+                    grid.set_value(center_x + x, center_y + y, ToolBar.get_particle())
 
     def get_particle():
         particles_list = [
-            PowderParticle(["#f6d7b0", "#f2d2a9", "#eccca2"]), 
-            LiquidParticle(["#00b1ff", "#0097ff", "#1588ff"]),
-            SolidParticle(["#dd8a3c", "#e69a4b"])]
+            PowderParticle(colors=["#f6d7b0", "#f2d2a9", "#eccca2"], gravity=2), 
+            LiquidParticle(colors=["#00b1ff", "#0097ff", "#1588ff"], gravity=3, dispersion=3),
+            Particle()]
         return particles_list[ToolBar.current_particle]
 
 class App:
@@ -48,13 +57,15 @@ class App:
             ToolBar.current_particle = 1
         elif keys[pygame.K_3]:
             ToolBar.current_particle = 2
+        elif keys[pygame.K_4]:
+            ToolBar.current_particle = 3
 
         if pygame.mouse.get_pressed()[0]:
             mouse_pos_in_grid = self.get_position_in_grid(pygame.mouse.get_pos())
             if self.grid.is_within(mouse_pos_in_grid[0], mouse_pos_in_grid[1]):
-                self.grid.set_value(mouse_pos_in_grid[0], mouse_pos_in_grid[1], ToolBar.get_particle())
+                ToolBar.draw(self.grid, mouse_pos_in_grid[0], mouse_pos_in_grid[1])
 
-        for y in range(self.grid.height - 1, 0, -1):
+        for y in range(self.grid.height - 1, -1, -1):
             random_row = list(range(self.grid.width))
             random.shuffle(random_row)
             for x in random_row:
