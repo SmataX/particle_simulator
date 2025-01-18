@@ -2,7 +2,7 @@ import pygame
 import random
 
 from grid import Grid
-from particle import PowderParticle, LiquidParticle, Particle
+from elements import Element, PowderElement, LiquidElement
 
 class ToolBar:
     current_particle = 0
@@ -18,9 +18,10 @@ class ToolBar:
 
     def get_particle():
         particles_list = [
-            PowderParticle(colors=["#f6d7b0", "#f2d2a9", "#eccca2"], gravity=2), 
-            LiquidParticle(colors=["#00b1ff", "#0097ff", "#1588ff"], gravity=3, dispersion=3),
-            Particle()]
+            None,
+            PowderElement(colors=["#f6d7b0", "#f2d2a9", "#eccca2"], gravity=2, inertial_resistance=0.1), 
+            LiquidElement(colors=["#00b1ff", "#0097ff", "#1588ff"], gravity=3, dispersion=3),
+            Element()]
         return particles_list[ToolBar.current_particle]
 
 class App:
