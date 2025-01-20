@@ -38,19 +38,17 @@ class MoveableElement(Element):
         return False
     
     def set_sides_free_fall(self, grid: Grid, x: int, y: int):
-        try:
-            if grid.is_within(x - 1, y):
-                target_cell = grid.get_value(x - 1, y)
+        if grid.is_within(x + 1, y):
+            target_cell = grid.get_value(x + 1, y)
+            if target_cell is not None and not target_cell.is_free_falling and random.random() > target_cell.inertial_resistance:
+                target_cell.is_free_falling = True
 
-                if random.random() > target_cell.inertial_resistance:
-                    target_cell.is_free_falling = True
+        if grid.is_within(x - 1, y):
+            target_cell = grid.get_value(x - 1, y)
 
-            if grid.is_within(x + 1, y):
-                target_cell = grid.get_value(x + 1, y)
-                if random.random() > target_cell.inertial_resistance:
-                    target_cell.is_free_falling = True
-        except:
-            pass
+            if target_cell is not None and not target_cell.is_free_falling and random.random() > target_cell.inertial_resistance:
+                target_cell.is_free_falling = True
+                    # target_cell.color = "#00ff00"
 
     def look_vertically(self, grid: Grid, x: int, y: int):
         velocity = 0
@@ -61,6 +59,7 @@ class MoveableElement(Element):
             target_cell = grid.get_value(x, y + i)
             if self.can_step_on(target_cell) == False:
                 break
+            self.set_sides_free_fall(grid, x, y + i)
             
             velocity += 1
         return y + velocity
@@ -89,6 +88,10 @@ class MoveableElement(Element):
             velocity[1] -= 1
 
         selected_side_value = random.choice([v for v in velocity if velocity != 0])
+
+        for i in range(selected_side_value):
+            self.set_sides_free_fall(grid, x + i, y + abs(i))
+
         return x + selected_side_value, y + abs(selected_side_value)
 
 
@@ -113,6 +116,8 @@ class MoveableElement(Element):
             velocity[0] -= 1
 
         selected_side_value = random.choice([v for v in velocity if velocity != 0])
+        for i in range(selected_side_value):
+            self.set_sides_free_fall(grid, x + i, y)
         return x + selected_side_value
 
 class PowderElement(MoveableElement):
@@ -132,12 +137,10 @@ class PowderElement(MoveableElement):
         if y != new_y:
             grid.swap_values(x, y, x, new_y)
             self.is_free_falling = True
-            self.set_sides_free_fall(grid, x, new_y)
         elif self.is_free_falling:
             new_x, new_y = self.look_diagonally(grid, x, y)
             if new_x != x:
                 grid.swap_values(x, y, new_x, new_y)
-                self.set_sides_free_fall(grid, new_x, new_y)
             else:
                 self.is_free_falling = False
 

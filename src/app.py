@@ -20,6 +20,7 @@ class ToolBar:
         particles_list = [
             None,
             PowderElement(colors=["#f6d7b0", "#f2d2a9", "#eccca2"], gravity=2, inertial_resistance=0.1), 
+            PowderElement(colors=["#22ee22"], gravity=2, inertial_resistance=0.8), 
             LiquidElement(colors=["#00b1ff", "#0097ff", "#1588ff"], gravity=3, dispersion=3),
             Element()]
         return particles_list[ToolBar.current_particle]
