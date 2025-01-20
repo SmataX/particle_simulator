@@ -40,13 +40,13 @@ class MoveableElement(Element):
     def set_sides_free_fall(self, grid: Grid, x: int, y: int):
         if grid.is_within(x + 1, y):
             target_cell = grid.get_value(x + 1, y)
-            if target_cell is not None and not target_cell.is_free_falling and random.random() > target_cell.inertial_resistance:
+            if target_cell is not None and hasattr(target_cell, "is_free_falling") and not target_cell.is_free_falling and random.random() > target_cell.inertial_resistance:
                 target_cell.is_free_falling = True
 
         if grid.is_within(x - 1, y):
             target_cell = grid.get_value(x - 1, y)
 
-            if target_cell is not None and not target_cell.is_free_falling and random.random() > target_cell.inertial_resistance:
+            if target_cell is not None and hasattr(target_cell, "is_free_falling") and not target_cell.is_free_falling and random.random() > target_cell.inertial_resistance:
                 target_cell.is_free_falling = True
                     # target_cell.color = "#00ff00"
 
@@ -119,6 +119,10 @@ class MoveableElement(Element):
         for i in range(selected_side_value):
             self.set_sides_free_fall(grid, x + i, y)
         return x + selected_side_value
+    
+
+    def special_behaviour(self, grid: Grid, x1: int, y1: int, x2: int, y2: int):
+        return True
 
 class PowderElement(MoveableElement):
     def __init__(self, name="particle", colors=["#ffffff"], explosion_resistance=0.5, gravity = 1, dispersion = 1, inertial_resistance = 0.5):
@@ -142,18 +146,43 @@ class PowderElement(MoveableElement):
             if new_x != x:
                 grid.swap_values(x, y, new_x, new_y)
             else:
-                self.is_free_falling = False
+                if random.random() < self.inertial_resistance:
+                    self.is_free_falling = False
 
 
 
 class LiquidElement(MoveableElement):
-    def __init__(self, name="particle", colors=["#ffffff"], explosion_resistance=0.5, gravity = 1, dispersion = 1):
-        super().__init__(name, colors, explosion_resistance, gravity, dispersion)
+    def __init__(self, name="particle", colors=["#ffffff"], explosion_resistance=0.5, gravity = 1, dispersion = 1, inertial_resistance = 0.5):
+        super().__init__(name, colors, explosion_resistance, gravity, dispersion, inertial_resistance)
     
     def step(self, grid: Grid, x: int, y: int):
         new_y = self.look_vertically(grid, x, y)
-        grid.swap_values(x, y, x, new_y)
+        if self.special_behaviour(grid, x, y, x, new_y):
+            grid.swap_values(x, y, x, new_y)
         if new_y == y:
             new_x = self.look_horizontally(grid, x, y)
-            grid.swap_values(x, y, new_x, y)
+            if self.special_behaviour(grid, x, y, new_x, y):
+                grid.swap_values(x, y, new_x, y)
+
+
+class AcidElement(LiquidElement):
+    def __init__(self, name="particle", colors=["#ffffff"], explosion_resistance=0.5, gravity=1, dispersion=1, inertial_resistance=0.5):
+        super().__init__(name, colors, explosion_resistance, gravity, dispersion, inertial_resistance)
+
+    def can_step_on(self, target_cell):
+        if target_cell == None:
+            return True
+        else:
+            if type(target_cell) == Element:
+                return True
+        return False
+    
+    def special_behaviour(self, grid, x1, y1, x2, y2):
+        target_cell = grid.get_value(x2, y2)
+        if target_cell is not None:
+            if type(target_cell) == Element and random.random() > 0.65:
+                grid.set_value(x1, y1, None)
+                grid.set_value(x2, y2, None)
+            return False
+        return True
         
