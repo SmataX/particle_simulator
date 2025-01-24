@@ -152,17 +152,19 @@ class PowderElement(MoveableElement):
 
 
 class LiquidElement(MoveableElement):
-    def __init__(self, name="particle", colors=["#ffffff"], explosion_resistance=0.5, gravity = 1, dispersion = 1, inertial_resistance = 0.5):
+    def __init__(self, name="particle", colors=["#ffffff"], explosion_resistance=0.5, gravity = 1, dispersion = 1, inertial_resistance = 0.5, viscosity: int = 0.1):
         super().__init__(name, colors, explosion_resistance, gravity, dispersion, inertial_resistance)
+        self.viscosity = viscosity
     
     def step(self, grid: Grid, x: int, y: int):
         new_y = self.look_vertically(grid, x, y)
         if self.special_behaviour(grid, x, y, x, new_y):
             grid.swap_values(x, y, x, new_y)
         if new_y == y:
-            new_x = self.look_horizontally(grid, x, y)
-            if self.special_behaviour(grid, x, y, new_x, y):
-                grid.swap_values(x, y, new_x, y)
+            if random.random() > self.viscosity:
+                new_x = self.look_horizontally(grid, x, y)
+                if self.special_behaviour(grid, x, y, new_x, y):
+                    grid.swap_values(x, y, new_x, y)
 
 
 class AcidElement(LiquidElement):

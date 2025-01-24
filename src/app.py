@@ -4,6 +4,8 @@ import random
 from grid import Grid
 from elements import Element, PowderElement, LiquidElement, AcidElement
 
+from user_interface import draw_ui, Button, get_inputs
+
 class ToolBar:
     current_particle = 0
     brush_radius = 5
@@ -18,22 +20,36 @@ class ToolBar:
 
     def get_particle():
         particles_list = [
-            None,
-            PowderElement(colors=["#f6d7b0", "#f2d2a9", "#eccca2"], gravity=2, inertial_resistance=1), 
-            PowderElement(colors=["#22ee22"], gravity=2, inertial_resistance=0), 
-            LiquidElement(colors=["#00b1ff", "#0097ff", "#1588ff"], gravity=3, dispersion=3),
-            AcidElement(name="Acid", colors=["#00ff00"], gravity=2, dispersion=3),
-            Element()]
+            PowderElement(name="sand", colors=["#f6d7b0", "#f2d2a9", "#eccca2"], gravity=2, dispersion=1, inertial_resistance=0.3), 
+            PowderElement(name="wet_sand", colors=["#997B5B", "#997B5B"], gravity=2, dispersion=1, inertial_resistance=0.7), 
+            PowderElement(name="ash", colors=["#868683", "#B4B4B4"], gravity=1, dispersion=3, inertial_resistance=0.05),
+            LiquidElement(name="water", colors=["#00b1ff", "#0097ff", "#1588ff"], gravity=3, dispersion=3, viscosity=0.1),
+            LiquidElement(name="lava", colors=["#EC753A", "#D73F24"], gravity=1, dispersion=2, viscosity=0.7),
+            Element()
+        ]
         return particles_list[ToolBar.current_particle]
+    
+    def change_element(id: int):
+        ToolBar.current_particle = id
 
 class App:
     def __init__(self, WIDTH: int = 100, HEIGHT = 100, CELL_SIZE = 4):
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE))
+        self.screen = pygame.display.set_mode((WIDTH * CELL_SIZE + 100, HEIGHT * CELL_SIZE))
         self.clock = pygame.time.Clock()
         self.running = True
         self.grid = Grid(WIDTH, HEIGHT)
         self.cell_size = CELL_SIZE
+
+
+        # UI
+        buttons = [
+            Button(value="sand", rect=pygame.Rect(WIDTH*CELL_SIZE + 10, 0, 80, 20), background_color="#ffffff", background_color_hover="#ff0000", action=ToolBar.change_element, action_args=0),
+            Button(value="wet sand", rect=pygame.Rect(WIDTH*CELL_SIZE + 10, 25, 80, 20), background_color="#ffffff", background_color_hover="#ff0000", action=ToolBar.change_element, action_args=1),
+            Button(value="ash", rect=pygame.Rect(WIDTH*CELL_SIZE + 10, 50, 80, 20), background_color="#ffffff", background_color_hover="#ff0000", action=ToolBar.change_element, action_args=2),
+            Button(value="water", rect=pygame.Rect(WIDTH*CELL_SIZE + 10, 75, 80, 20), background_color="#ffffff", background_color_hover="#ff0000", action=ToolBar.change_element, action_args=3),
+            Button(value="lava", rect=pygame.Rect(WIDTH*CELL_SIZE + 10, 100, 80, 20), background_color="#ffffff", background_color_hover="#ff0000", action=ToolBar.change_element, action_args=4)
+        ]
 
         while self.running:
             for event in pygame.event.get():
@@ -42,6 +58,10 @@ class App:
                     
 
             self.screen.fill("#000000")
+
+            # UI
+            draw_ui(self.screen, buttons)
+            get_inputs(buttons)
 
             self.update()
 
