@@ -1,8 +1,8 @@
 class Grid:
     def __init__(self, width: int, height: int):
-        self.width = 100
-        self.height = 100
-        self.grid = [[None for _ in range(width)] for _ in range(width)]
+        self.width = width
+        self.height = height
+        self.grid = [[None for _ in range(width)] for _ in range(height)]
 
     def is_within(self, x: int, y: int) -> bool:
         return x >= 0 and x < self.width and y >= 0 and y < self.height
