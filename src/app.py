@@ -5,19 +5,6 @@ from modules.grid import Grid
 from modules.drawing import Drawing
 from user_interface import Button, get_inputs, draw_ui
 
-# Powders
-from modules.elements.sand import Sand
-from modules.elements.wet_sand import WetSand
-from modules.elements.ash import Ash
-
-# Liquids
-from modules.elements.water import Water
-from modules.elements.lava import Lava
-from modules.elements.acid import Acid
-
-# Static
-from modules.elements.stone import Stone
-
 class App:
     def __init__(self, WIDTH: int = 100, HEIGHT = 100, CELL_SIZE = 4):
         pygame.init()

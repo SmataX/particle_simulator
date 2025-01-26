@@ -1,5 +1,6 @@
 import random
 import pygame
+import math
 
 from modules.grid import Grid
 
@@ -19,6 +20,7 @@ from modules.elements.stone import Stone
 class Drawing:
     list_of_elements = [Sand, WetSand, Ash, Water, Lava, Acid, Stone]
     selected_element = 0
+    radius = 3
 
     last_mouse_position = None
 
@@ -41,8 +43,6 @@ class Drawing:
         else:
             Drawing.last_mouse_position = None
             
-            
-            
 
     def draw_between_two_points(grid: Grid, x1: int, y1: int, x2: int, y2: int, set_none = False):
         dx = x1 - x2
@@ -59,9 +59,22 @@ class Drawing:
                     value = None
                 else:
                     value = Drawing.list_of_elements[Drawing.selected_element]()
-                grid.set_value(step_x, step_y, value)
+                Drawing.draw_circle(grid, step_x, step_y, Drawing.radius, value)
                     
 
+    def draw_circle(grid: Grid, x: int, y: int, radius: int, value):
+        for dx in range(-radius, radius + 1):
+            for dy in range(-radius, radius + 1):
+                distance = math.sqrt(dx**2 + dy**2)
+                if distance <= radius:
+                    target_x = x + dx
+                    target_y = y + dy
+        
+                    if grid.is_within(target_x, target_y):
+                        if value is None:
+                            grid.set_value(target_x, target_y, value)
+                        elif grid.get_value(target_x, target_y) is None:
+                            grid.set_value(target_x, target_y, value)
 
     def change_element(id: int):
         Drawing.selected_element = id
